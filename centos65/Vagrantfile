@@ -9,6 +9,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.vm.box = "http://uec-images.ubuntu.com/vagrant/trusty/20140531.1/trusty-server-cloudimg-amd64-vagrant-disk1.box"
   config.vm.box = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.3/centos65-x86_64-20140116.box"
 
+  config.ssh.forward_agent = true
   config.vm.define "contrails1" do |contrails1|
 
     contrails1.vm.hostname = "contrails1"
@@ -18,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision :shell, :path => "install_contrails"
     contrails1.vm.provider "virtualbox" do |v|
         v.memory = 2048
-        v.cpus = 8
+        v.cpus = 4
     end
   end
 

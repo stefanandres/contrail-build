@@ -56,5 +56,5 @@ python third_party/fetch_packages.py >/dev/null &&
 cd /etc/yum.repos.d &&
 wget -q http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo
 yum -q install -y devtoolset-1.1-gcc devtoolset-1.1-gcc-c++ &&
-cd /tmp/contrails/ && scl enable devtoolset-1.1 "PATH=/opt/autoconf/bin:/opt/centos/devtoolset-1.1/root/usr/bin:$PATH; scons --opt=production --root=/tmp/contrails_install -j 8 install"
+cd /tmp/contrails/ && scl enable devtoolset-1.1 "PATH=/opt/autoconf/bin:/opt/centos/devtoolset-1.1/root/usr/bin:$PATH; scons --opt=production --root=/tmp/contrails_install install"
 
