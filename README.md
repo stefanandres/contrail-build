@@ -15,3 +15,7 @@ If you want to run it in the background, you need to configure your ssh key in t
 3. `cd contrails-build/centos65`
 6. `vagrant up`
 7. binaries currently are deployed in the VM in /tmp/contrails_install (vagrant ssh to enter VM)
+
+## KNOWN ISSUES
+
+* adding -j to the actual scons install job breaks the build process, so the entire build takes like 30-60 minutes
