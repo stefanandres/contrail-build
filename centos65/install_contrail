@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# 2014, s.andres@syseleven.de
+set -x
+
+# add github personal key for repo init and known host to prevent interactive questions from ssh
+if [[ -f /vagrant/add_personal_github_key ]]; then
+	/vagrant/add_personal_github_key
+else
+	mkdir /root/.ssh
+	cat > /root/.ssh/id_rsa <<EOF
+-----BEGIN RSA PRIVATE KEY-----
+INSERT PROPER KEY HERE
+-----END RSA PRIVATE KEY-----
+EOF
+	chmod 0600 /root/.ssh/id_rsa
+fi &&
+cat > /root/.ssh/known_hosts <<EOF
+github.com,192.30.252.131 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+EOF
+
+# requirements
+yum -q install -y scons git python-lxml patch make unzip flex bison openssl-devel autoconf automake vim python-devel python-setuptools wget
+
+# recent autoconf
+cd /tmp && wget -q http://ftp.gnu.org/gnu/autoconf/autoconf-2.68.tar.bz2 &&
+tar xjpf autoconf-2.68.tar.bz2
+cd autoconf-2.68
+./configure --prefix=/opt/autoconf >/dev/null && make >/dev/null && make install >/dev/null
+
+PATH=/opt/autoconf/bin:$PATH
+
+# recent git
+cd /tmp
+yum -q install -y libcurl-devel expat-devel perl-ExtUtils-MakeMaker
+git  clone -q https://github.com/git/git.git --depth 1 &&
+cd git &&
+make -j 4 >/dev/null &&
+
+PATH=/tmp/git/:$PATH
+
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
+# contrails repo
+cd /tmp &&
+mkdir contrails && cd contrails
+curl -s https://storage.googleapis.com/git-repo-downloads/repo > repo &&
+chmod +x repo &&
+./repo init -u git@github.com:Juniper/contrail-vnc <<< 'n' >/dev/null && # FIXME THIS NEEDS GITHUB SSH KEY OR YOU WILL GET PERMISSION DENIED 
+./repo sync >/dev/null &&
+yum install  -y npm && # needed for fetch_packages
+python third_party/fetch_packages.py >/dev/null &&
+
+
+# needed requirements for scons install
+cd /etc/yum.repos.d &&
+wget -q http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo
+yum -q install -y devtoolset-1.1-gcc devtoolset-1.1-gcc-c++ &&
+# adding -j to the scons job currently breaks the build-process
+cd /tmp/contrails/ && scl enable devtoolset-1.1 "PATH=/opt/autoconf/bin:/opt/centos/devtoolset-1.1/root/usr/bin:$PATH; scons --opt=production --root=/tmp/contrails_install install"
+
