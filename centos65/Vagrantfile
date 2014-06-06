@@ -10,14 +10,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.3/centos65-x86_64-20140116.box"
 
   config.ssh.forward_agent = true
-  config.vm.define "contrails1" do |contrails1|
+  config.vm.define "contrail1" do |contrail1|
 
-    contrails1.vm.hostname = "contrails1"
+    contrail1.vm.hostname = "contrail1"
 
-    #contrails1.vm.synced_folder "/mnt/nfs", "/mnt/nfs"
+    #contrail1.vm.synced_folder "/mnt/nfs", "/mnt/nfs"
 
-    config.vm.provision :shell, :path => "install_contrails"
-    contrails1.vm.provider "virtualbox" do |v|
+    config.vm.provision :shell, :path => "install_contrail"
+    contrail1.vm.provider "virtualbox" do |v|
         v.memory = 2048
         v.cpus = 4
     end
